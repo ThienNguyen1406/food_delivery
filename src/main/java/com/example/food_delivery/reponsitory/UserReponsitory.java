@@ -16,4 +16,11 @@ public interface UserReponsitory extends JpaRepository <Users,Integer>{
      * @return
      */
     List<Users> findByUserNameAndPassword(String userName, String password);
+
+    /**
+     *
+     * @param userName
+     * @return
+     */
+    Users findByUserName(String userName);
 }

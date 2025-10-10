@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/login")
 public class LoginController {
@@ -20,9 +21,11 @@ public class LoginController {
         if(loginServiceImp.checkLogin(username, password)){
             responseData.setCode(200);
             responseData.setData(true);
+            responseData.setDescription("Sign in successful");
         }else {
-//            responseData.setCode(400);
+            responseData.setCode(400);// error code
             responseData.setData(false);
+            responseData.setDescription("Invalid username or password");
         }
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
