@@ -4,28 +4,38 @@ import com.example.food_delivery.payload.ResponseData;
 import com.example.food_delivery.payload.request.SignUpRequest;
 import com.example.food_delivery.service.LoginService;
 import com.example.food_delivery.service.imp.LoginServiceImp;
+import com.example.food_delivery.utils.JWTUtilsHelper;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Encoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("*")
+import javax.crypto.SecretKey;
+
 @RestController
 @RequestMapping("/login")
 public class LoginController {
     @Autowired
     LoginServiceImp loginServiceImp;
+
+    @Autowired
+    JWTUtilsHelper jwtUtilsHelper;
+
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestParam String username, @RequestParam String password) {
         ResponseData  responseData = new ResponseData();
         if(loginServiceImp.checkLogin(username, password)){
+            String token = jwtUtilsHelper.generateToken(username);
             responseData.setCode(200);
-            responseData.setData(true);
-            responseData.setDescription("Sign in successful");
+            responseData.setData(token);
+
         }else {
             responseData.setCode(400);// error code
-            responseData.setData(false);
-            responseData.setDescription("Invalid username or password");
+            responseData.setData("");
+            responseData.setSuccess(false);
         }
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
