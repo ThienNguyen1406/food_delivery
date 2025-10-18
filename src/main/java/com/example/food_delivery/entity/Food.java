@@ -15,10 +15,30 @@ public class Food {
     private String image;
     @Column(name = "price")
     private double price;
+    @Column(name = "is_freeship")
+    private boolean isFreeShip;
+    @Column(name = "time_ship")
+    private String time_ship;
+
+    public String getTime_ship() {
+        return time_ship;
+    }
+
+    public void setTime_ship(String time_ship) {
+        this.time_ship = time_ship;
+    }
 
     @ManyToOne
     @JoinColumn(name = "cate_id")
     private Category category;
+
+    public boolean isFreeShip() {
+        return isFreeShip;
+    }
+
+    public void setFreeShip(boolean freeShip) {
+        isFreeShip = freeShip;
+    }
 
     @OneToMany(mappedBy = "food")
     private Set<RatingFood> listRatingFood;

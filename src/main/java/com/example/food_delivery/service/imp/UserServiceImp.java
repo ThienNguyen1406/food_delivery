@@ -4,6 +4,6 @@ import com.example.food_delivery.entity.Users;
 
 import java.util.List;
 
-public interface UserImp {
+public interface UserServiceImp {
     List<Users> getUsers();
 }

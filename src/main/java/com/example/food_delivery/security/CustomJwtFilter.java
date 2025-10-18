@@ -40,7 +40,7 @@ public class CustomJwtFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
         String token = null;
         if(StringUtils.hasText(header) && header.startsWith("Bearer ")){
-            token = header.substring(7);// get token
+            token = header.substring(7);
         }
 
         return token;
