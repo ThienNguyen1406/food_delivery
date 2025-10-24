@@ -9,11 +9,6 @@ import java.util.List;
 @Repository
 public interface UserReponsitory extends JpaRepository <Users,Integer>{
     //custom query login
-    /**
-     *
-     * @param userName
-     * @param password
-     * @return
-     */
     List<Users> findByUserNameAndPassword(String userName, String password);
+    Users findByUserName(String userName);
 }
