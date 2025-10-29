@@ -1,7 +1,7 @@
 package com.example.food_delivery.controller;
 
 import com.example.food_delivery.payload.ResponseData;
-import com.example.food_delivery.payload.request.SignUpRequest;
+import com.example.food_delivery.dto.request.SignupRequest;
 import com.example.food_delivery.service.LoginService;
 import com.example.food_delivery.service.imp.LoginServiceImp;
 import com.example.food_delivery.utils.JWTUtilsHelper;
@@ -43,7 +43,7 @@ public class LoginController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<?> signup(@RequestBody SignupRequest signUpRequest) {
         ResponseData  responseData = new ResponseData();
 
         responseData.setCode(200);

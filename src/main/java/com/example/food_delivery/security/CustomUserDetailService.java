@@ -1,6 +1,6 @@
 package com.example.food_delivery.security;
 
-import com.example.food_delivery.entity.Users;
+import com.example.food_delivery.domain.entity.Users;
 import com.example.food_delivery.reponsitory.UserReponsitory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;

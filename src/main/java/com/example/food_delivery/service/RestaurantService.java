@@ -1,8 +1,12 @@
 package com.example.food_delivery.service;
 
-import com.example.food_delivery.dto.RestaurantDTO;
-import com.example.food_delivery.entity.RatingRestaurant;
-import com.example.food_delivery.entity.Restaurant;
+import com.example.food_delivery.dto.response.CategoryDTO;
+import com.example.food_delivery.dto.response.MenuDTO;
+import com.example.food_delivery.dto.response.RestaurantDTO;
+import com.example.food_delivery.domain.entity.Food;
+import com.example.food_delivery.domain.entity.MenuRestaurant;
+import com.example.food_delivery.domain.entity.RatingRestaurant;
+import com.example.food_delivery.domain.entity.Restaurant;
 import com.example.food_delivery.reponsitory.RestaurantReponsitory;
 import com.example.food_delivery.service.imp.FileServiceImp;
 import com.example.food_delivery.service.imp.RestaurantServiceImp;
@@ -13,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class RestaurantService implements RestaurantServiceImp {
@@ -62,6 +63,7 @@ public class RestaurantService implements RestaurantServiceImp {
 
         for(Restaurant restaurant : listData){
             RestaurantDTO restaurantDTO = new RestaurantDTO();
+            restaurantDTO.setId(restaurant.getId());
             restaurantDTO.setImage(restaurant.getImage());
             restaurantDTO.setTitle(restaurant.getTitle());
             restaurantDTO.setSubtitle(restaurant.getSubtitle());
@@ -81,5 +83,44 @@ public class RestaurantService implements RestaurantServiceImp {
         }
 
        return totalPoint / listRating.size();
+    }
+
+    @Override
+    public RestaurantDTO getDetailRestaurant(int id) {
+        Optional<Restaurant> restaurant = restaurantReponsitory.findById(id);
+        RestaurantDTO restaurantDTO = new RestaurantDTO();
+        if(restaurant.isPresent()){
+            Restaurant data = restaurant.get();
+            List<CategoryDTO> categoryDTOList = new ArrayList<>();
+            restaurantDTO.setTitle(data.getTitle());
+            restaurantDTO.setSubtitle(data.getSubtitle());
+            restaurantDTO.setImage(data.getImage());
+            restaurantDTO.setRating(calculateRating(data.getLisRatingRestaurant()));
+            restaurantDTO.setFreeShip(data.isFreeship());
+            restaurantDTO.setDescription(data.getDescription());
+            restaurantDTO.setOpenDate(data.getOpenDate());
+
+            //listCategory
+            for (MenuRestaurant menuRestaurant: data.getLisMenuRestaurant()){
+                CategoryDTO categoryDTO = new CategoryDTO();
+                categoryDTO.setName(menuRestaurant.getCategory().getNameCate());
+
+                List<MenuDTO>menuDTOList = new ArrayList<>();
+
+                //menu
+                for (Food food :menuRestaurant.getCategory().getLisFood()){
+                    MenuDTO menuDTO = new MenuDTO();
+                    menuDTO.setImage(food.getImage());
+                    menuDTO.setFreeShip(food.isFreeShip());
+                    menuDTO.setTitle(food.getTitle());
+
+                    menuDTOList.add(menuDTO);
+                }
+                categoryDTO.setMenus(menuDTOList);
+                categoryDTOList.add(categoryDTO);
+            }
+            restaurantDTO.setCategories(categoryDTOList);
+        }
+        return restaurantDTO;
     }
 }

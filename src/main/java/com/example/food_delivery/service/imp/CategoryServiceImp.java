@@ -1,7 +1,6 @@
 package com.example.food_delivery.service.imp;
 
-import com.example.food_delivery.dto.CategoryDTO;
-import com.example.food_delivery.entity.Category;
+import com.example.food_delivery.dto.response.CategoryDTO;
 
 import java.util.List;
 

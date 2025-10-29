@@ -1,21 +1,15 @@
 package com.example.food_delivery.service;
 
-import com.example.food_delivery.dto.UserDTO;
-import com.example.food_delivery.entity.Roles;
-import com.example.food_delivery.entity.Users;
-import com.example.food_delivery.payload.request.SignUpRequest;
+import com.example.food_delivery.dto.request.SignupRequest;
+import com.example.food_delivery.dto.response.UserDTO;
+import com.example.food_delivery.domain.entity.Roles;
+import com.example.food_delivery.domain.entity.Users;
 import com.example.food_delivery.reponsitory.UserReponsitory;
 import com.example.food_delivery.service.imp.LoginServiceImp;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.crypto.SecretKey;
-import java.beans.Encoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,14 +45,11 @@ public class LoginService implements LoginServiceImp {
     }
 
     @Override
-    public Boolean addUser(SignUpRequest signUpRequest) {
-        Roles roles = new Roles();
-        roles.setId(signUpRequest.getRoleId());
+    public Boolean addUser(SignupRequest signUpRequest) {
         Users users = new Users();
-        users.setFullName(signUpRequest.getFullName());
+        users.setFullName(signUpRequest.getFullname());
         users.setPassword(signUpRequest.getPassword());
-        users.setUserName(signUpRequest.getEmail());
-        users.setRoles(roles);
+        users.setUserName(signUpRequest.getUserName());
 
         //save thành công id sẽ có giá trị
         try{
@@ -68,4 +59,8 @@ public class LoginService implements LoginServiceImp {
             return false;
         }
     }
+
+
+
+
 }

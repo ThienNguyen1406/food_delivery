@@ -1,9 +1,9 @@
 package com.example.food_delivery.service;
 
-import com.example.food_delivery.dto.CategoryDTO;
-import com.example.food_delivery.dto.MenuDTO;
-import com.example.food_delivery.entity.Category;
-import com.example.food_delivery.entity.Food;
+import com.example.food_delivery.dto.response.CategoryDTO;
+import com.example.food_delivery.dto.response.MenuDTO;
+import com.example.food_delivery.domain.entity.Category;
+import com.example.food_delivery.domain.entity.Food;
 import com.example.food_delivery.reponsitory.CategoryRepository;
 import com.example.food_delivery.service.imp.CategoryServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
