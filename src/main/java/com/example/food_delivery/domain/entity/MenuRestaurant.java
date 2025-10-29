@@ -20,15 +20,28 @@ public class MenuRestaurant {
     KeyMenuRestaurant keys;
 
     @ManyToOne
-    @JoinColumn(name = "cate_id", insertable = false, updatable = false)
-    private Category category;
+    @MapsId("cateId")
+    @JoinColumn(name = "cate_id")
+    Category category;
 
     @ManyToOne
-    @JoinColumn(name = "res_id", insertable = false, updatable = false)
-    private Restaurant restaurant;
+    @MapsId("resId")
+    @JoinColumn(name = "res_id")
+    Restaurant restaurant;
 
-    @Column(name = "created_date")
-    private Date createDate;
+    @Column(name = "create_date")
+    Date createDate;
+
+    @Column(name = "update_date")
+    Date updateDate;
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
     public KeyMenuRestaurant getKeys() {
         return keys;

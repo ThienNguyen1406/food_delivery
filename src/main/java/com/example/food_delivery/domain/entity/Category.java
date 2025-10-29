@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -29,16 +30,10 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private Set<Food> lisFood;
 
-    @OneToMany(mappedBy = "category")
-    private Set<MenuRestaurant> lisMenuRestaurant;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<MenuRestaurant> menuRestaurants = new HashSet<>();
 
-    public Set<MenuRestaurant> getLisMenuRestaurant() {
-        return lisMenuRestaurant;
-    }
 
-    public void setLisMenuRestaurant(Set<MenuRestaurant> lisMenuRestaurant) {
-        this.lisMenuRestaurant = lisMenuRestaurant;
-    }
 
     public int getId() {
         return id;

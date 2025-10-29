@@ -13,11 +13,10 @@ public interface RoleRepository extends JpaRepository<Roles, Integer> {
             value = """
                     SELECT r.*
                     FROM roles r
-                    INNER JOIN users_roles ur ON r.id = ur.roles_name
-                    WHERE ur.users_id = :userId
+                    INNER JOIN users u ON r.id = u.role_id
+                    WHERE u.id = :userId
                     """,
             nativeQuery = true
-
     )
     List<Roles> findAllByUserId(int userId);
 }

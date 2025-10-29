@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity(name = "promo")
+@EqualsAndHashCode
 public class Promo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
