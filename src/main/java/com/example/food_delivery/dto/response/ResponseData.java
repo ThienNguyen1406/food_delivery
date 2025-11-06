@@ -1,5 +1,7 @@
 package com.example.food_delivery.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ResponseData {
     private int status = 200;
     private boolean isSuccess = true;
@@ -10,8 +12,20 @@ public class ResponseData {
         return isSuccess;
     }
 
+    @JsonProperty("isSuccess")
+    public void setIsSuccess(boolean isSuccess) {
+        this.isSuccess = isSuccess;
+    }
+    
+    // Alias setter for compatibility
     public void setSuccess(boolean success) {
-        isSuccess = success;
+        this.isSuccess = success;
+    }
+    
+    // Alias getter for compatibility (Jackson may serialize isSuccess as "success")
+    @JsonProperty("success")
+    public boolean getSuccess() {
+        return isSuccess;
     }
 
     public int getStatus() {

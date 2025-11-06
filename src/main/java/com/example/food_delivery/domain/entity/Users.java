@@ -1,5 +1,6 @@
 package com.example.food_delivery.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,9 @@ public class Users {
     @Column(name = "fullname")
     private String fullName;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name =  "created_date")
     private Date createDate;
 
@@ -48,6 +52,7 @@ public class Users {
 
 
     @OneToMany(mappedBy = "users")
+    @JsonIgnore
     private Set<Orders> listOrders;
 
     public Set<Orders> getListOrders() {
@@ -120,5 +125,13 @@ public class Users {
 
     public void setRoles(Roles roles) {
         this.roles = roles;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

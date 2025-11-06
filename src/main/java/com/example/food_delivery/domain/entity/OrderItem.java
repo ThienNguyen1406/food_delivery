@@ -1,6 +1,7 @@
 package com.example.food_delivery.domain.entity;
 
 import com.example.food_delivery.domain.entity.keys.KeyOrderItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    @JsonIgnore
     private Orders orders;
 
     @ManyToOne

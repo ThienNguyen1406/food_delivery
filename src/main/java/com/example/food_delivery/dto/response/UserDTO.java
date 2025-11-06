@@ -8,7 +8,9 @@ public class UserDTO {
     private String userName;
     private String password;
     private String fullName;
+    private String phoneNumber;
     private Date createDate;
+    private String roleName;
 
     public int getId() {
         return id;
@@ -48,5 +50,21 @@ public class UserDTO {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

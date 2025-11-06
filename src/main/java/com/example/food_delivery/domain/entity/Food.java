@@ -1,5 +1,6 @@
 package com.example.food_delivery.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -63,6 +64,7 @@ public class Food {
     private Set<RatingFood> listRatingFood;
 
     @OneToMany(mappedBy = "food")
+    @JsonIgnore
     private Set<OrderItem> lisOrderItems;
 
 //    @ManyToOne

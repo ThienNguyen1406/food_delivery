@@ -64,7 +64,12 @@ public class RestaurantService implements RestaurantServiceImp {
         for(Restaurant restaurant : listData){
             RestaurantDTO restaurantDTO = new RestaurantDTO();
             restaurantDTO.setId(restaurant.getId());
-            restaurantDTO.setImage(restaurant.getImage());
+            // Convert image filename to full URL
+            if (restaurant.getImage() != null && !restaurant.getImage().isEmpty()) {
+                restaurantDTO.setImage("/restaurant/file/" + restaurant.getImage());
+            } else {
+                restaurantDTO.setImage(restaurant.getImage());
+            }
             restaurantDTO.setTitle(restaurant.getTitle());
             restaurantDTO.setSubtitle(restaurant.getSubtitle());
             restaurantDTO.setFreeShip(restaurant.isFreeship());
@@ -77,12 +82,15 @@ public class RestaurantService implements RestaurantServiceImp {
     }
 
     private Double calculateRating(Set<RatingRestaurant> listRating){
+        if (listRating == null || listRating.isEmpty()) {
+            return 0.0;
+        }
         double totalPoint = 0;
         for(RatingRestaurant data : listRating){
             totalPoint += data.getRatePoint();
         }
 
-       return totalPoint / listRating.size();
+        return totalPoint / listRating.size();
     }
 
     @Override
@@ -94,30 +102,58 @@ public class RestaurantService implements RestaurantServiceImp {
             List<CategoryDTO> categoryDTOList = new ArrayList<>();
             restaurantDTO.setTitle(data.getTitle());
             restaurantDTO.setSubtitle(data.getSubtitle());
-            restaurantDTO.setImage(data.getImage());
+            // Convert image filename to full URL
+            if (data.getImage() != null && !data.getImage().isEmpty()) {
+                restaurantDTO.setImage("/restaurant/file/" + data.getImage());
+            } else {
+                restaurantDTO.setImage(data.getImage());
+            }
             restaurantDTO.setRating(calculateRating(data.getLisRatingRestaurant()));
             restaurantDTO.setFreeShip(data.isFreeship());
             restaurantDTO.setDescription(data.getDescription());
             restaurantDTO.setOpenDate(data.getOpenDate());
+            restaurantDTO.setId(data.getId());
 
-            //listCategory
-            for (MenuRestaurant menuRestaurant: data.getLisMenuRestaurant()){
-                CategoryDTO categoryDTO = new CategoryDTO();
-                categoryDTO.setName(menuRestaurant.getCategory().getNameCate());
+            //listCategory - lấy từ menu_restaurant
+            if (data.getLisMenuRestaurant() != null && !data.getLisMenuRestaurant().isEmpty()) {
+                // Có dữ liệu trong menu_restaurant - lấy categories từ đó
+                for (MenuRestaurant menuRestaurant: data.getLisMenuRestaurant()){
+                    if (menuRestaurant.getCategory() == null) continue;
+                    
+                    CategoryDTO categoryDTO = new CategoryDTO();
+                    categoryDTO.setName(menuRestaurant.getCategory().getNameCate());
 
-                List<MenuDTO>menuDTOList = new ArrayList<>();
+                    List<MenuDTO>menuDTOList = new ArrayList<>();
 
-                //menu
-                for (Food food :menuRestaurant.getCategory().getLisFood()){
-                    MenuDTO menuDTO = new MenuDTO();
-                    menuDTO.setImage(food.getImage());
-                    menuDTO.setFreeShip(food.isFreeShip());
-                    menuDTO.setTitle(food.getTitle());
+                    //menu - lấy tất cả foods của category này
+                    if (menuRestaurant.getCategory().getLisFood() != null) {
+                        for (Food food : menuRestaurant.getCategory().getLisFood()) {
+                            MenuDTO menuDTO = new MenuDTO();
+                            menuDTO.setId(food.getId());
+                            menuDTO.setTitle(food.getTitle());
+                            menuDTO.setDescription(food.getDesc());
+                            menuDTO.setPrice(food.getPrice());
+                            menuDTO.setTimeShip(food.getTime_ship());
+                            
+                            // Convert image filename to full URL
+                            if (food.getImage() != null && !food.getImage().isEmpty()) {
+                                menuDTO.setImage("/menu/file/" + food.getImage());
+                            } else {
+                                menuDTO.setImage(food.getImage());
+                            }
+                            
+                            menuDTO.setFreeShip(food.isFreeShip());
 
-                    menuDTOList.add(menuDTO);
+                            menuDTOList.add(menuDTO);
+                        }
+                    }
+                    categoryDTO.setMenus(menuDTOList);
+                    categoryDTOList.add(categoryDTO);
                 }
-                categoryDTO.setMenus(menuDTOList);
-                categoryDTOList.add(categoryDTO);
+            } else {
+                // Nếu không có menu_restaurant, fallback: lấy tất cả categories và foods
+                // (Có thể import tất cả categories, nhưng tốt nhất là thêm dữ liệu vào menu_restaurant)
+                System.out.println("⚠️ Restaurant " + id + " has no menu_restaurant entries. Please run insert_menu_restaurant.sql");
             }
             restaurantDTO.setCategories(categoryDTOList);
         }
