@@ -17,6 +17,7 @@ import java.util.Date;
 public class Promo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "res_id")
@@ -28,6 +29,14 @@ public class Promo {
     private Date startDate;
     @Column(name = "end_date")
     private Date endDate;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Restaurant getRestaurant() {
         return restaurant;

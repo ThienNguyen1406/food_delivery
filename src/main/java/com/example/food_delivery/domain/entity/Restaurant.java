@@ -44,6 +44,7 @@ public class Restaurant {
     private Set<Orders> listOrders;
 
     @OneToMany(mappedBy = "restaurant")
+    @JsonIgnore // Prevent circular reference when serializing to JSON (Restaurant -> MenuRestaurant -> Restaurant)
     private Set<MenuRestaurant> lisMenuRestaurant;
 
     @OneToMany(mappedBy = "restaurant")

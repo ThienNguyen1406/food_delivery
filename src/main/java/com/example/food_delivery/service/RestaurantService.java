@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Optional;
 
 @Service
 public class RestaurantService implements RestaurantServiceImp {
@@ -158,5 +159,86 @@ public class RestaurantService implements RestaurantServiceImp {
             restaurantDTO.setCategories(categoryDTOList);
         }
         return restaurantDTO;
+    }
+
+    @Override
+    public boolean updateRestaurant(int id, MultipartFile file, String title, String subtitle, String description, Boolean is_freeship, String address, String open_date) {
+        try {
+            Optional<Restaurant> restaurantOptional = restaurantReponsitory.findById(id);
+            if (restaurantOptional.isEmpty()) {
+                System.err.println("Restaurant not found with id: " + id);
+                return false;
+            }
+            
+            Restaurant restaurant = restaurantOptional.get();
+            
+            // Update file if provided
+            if (file != null && !file.isEmpty()) {
+                boolean isSaveFileSuccess = fileServiceImp.saveFile(file);
+                if (isSaveFileSuccess) {
+                    restaurant.setImage(file.getOriginalFilename());
+                } else {
+                    System.err.println("Failed to save file");
+                    return false;
+                }
+            }
+            
+            // Update other fields if provided
+            if (title != null && !title.trim().isEmpty()) {
+                restaurant.setTitle(title.trim());
+            }
+            
+            if (subtitle != null) {
+                restaurant.setSubtitle(subtitle.trim());
+            }
+            
+            if (description != null) {
+                restaurant.setDescription(description.trim());
+            }
+            
+            if (is_freeship != null) {
+                restaurant.setFreeship(is_freeship);
+            }
+            
+            if (address != null && !address.trim().isEmpty()) {
+                restaurant.setAddress(address.trim());
+            }
+            
+            if (open_date != null && !open_date.trim().isEmpty()) {
+                try {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                    Date openDate = simpleDateFormat.parse(open_date);
+                    restaurant.setOpenDate(openDate);
+                } catch (Exception e) {
+                    System.err.println("Error parsing open_date: " + e.getMessage());
+                    // Don't fail if date parsing fails, just skip it
+                }
+            }
+            
+            restaurantReponsitory.save(restaurant);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error updating restaurant: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteRestaurant(int id) {
+        try {
+            Optional<Restaurant> restaurantOptional = restaurantReponsitory.findById(id);
+            if (restaurantOptional.isEmpty()) {
+                System.err.println("Restaurant not found with id: " + id);
+                return false;
+            }
+            
+            restaurantReponsitory.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error deleting restaurant: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

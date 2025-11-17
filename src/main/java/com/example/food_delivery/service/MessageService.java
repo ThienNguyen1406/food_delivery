@@ -112,9 +112,19 @@ public class MessageService implements MessageServiceImp {
             System.out.println("Total unique users: " + uniqueUsersMap.size());
             
             // Lọc chỉ lấy users (không phải admin)
+            // Nếu user.getRoles() là null, coi như là USER (không phải admin)
             List<Users> filteredUsers = uniqueUsersMap.values().stream()
-                    .filter(user -> user.getRoles() != null && 
-                            !"ADMIN".equalsIgnoreCase(user.getRoles().getRoleName()))
+                    .filter(user -> {
+                        if (user.getRoles() == null) {
+                            // Nếu không có role, coi như là USER
+                            System.out.println("User " + user.getId() + " has no role, treating as USER");
+                            return true;
+                        }
+                        String roleName = user.getRoles().getRoleName();
+                        boolean isNotAdmin = !"ADMIN".equalsIgnoreCase(roleName);
+                        System.out.println("User " + user.getId() + " has role: " + roleName + ", isNotAdmin: " + isNotAdmin);
+                        return isNotAdmin;
+                    })
                     .collect(Collectors.toList());
             
             System.out.println("Filtered users (non-admin): " + filteredUsers.size());

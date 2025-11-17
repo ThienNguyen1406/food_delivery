@@ -103,12 +103,22 @@ public class AdminRestaurantController {
                 return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
             }
             
-            // Note: Cần thêm method updateRestaurant vào RestaurantService
-            responseData.setStatus(501);
-            responseData.setSuccess(false);
-            responseData.setData(false);
-            responseData.setDesc("Chức năng cập nhật nhà hàng chưa được triển khai. Cần thêm method updateRestaurant vào RestaurantService");
-            return new ResponseEntity<>(responseData, HttpStatus.NOT_IMPLEMENTED);
+            // Update restaurant
+            boolean isSuccess = restaurantServiceImp.updateRestaurant(id, file, title, subtitle, description, is_freeship, address, open_date);
+            
+            if (isSuccess) {
+                responseData.setStatus(200);
+                responseData.setSuccess(true);
+                responseData.setData(true);
+                responseData.setDesc("Cập nhật nhà hàng thành công!");
+            } else {
+                responseData.setStatus(400);
+                responseData.setSuccess(false);
+                responseData.setData(false);
+                responseData.setDesc("Cập nhật nhà hàng thất bại! Có thể nhà hàng không tồn tại.");
+            }
+            
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
         } catch (Exception e) {
             System.err.println("Error updating restaurant: " + e.getMessage());
             e.printStackTrace();
@@ -138,12 +148,22 @@ public class AdminRestaurantController {
                 return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
             }
             
-            // Note: Cần thêm method deleteRestaurant vào RestaurantService
-            responseData.setStatus(501);
-            responseData.setSuccess(false);
-            responseData.setData(false);
-            responseData.setDesc("Chức năng xóa nhà hàng chưa được triển khai. Cần thêm method deleteRestaurant vào RestaurantService");
-            return new ResponseEntity<>(responseData, HttpStatus.NOT_IMPLEMENTED);
+            // Delete restaurant
+            boolean isSuccess = restaurantServiceImp.deleteRestaurant(id);
+            
+            if (isSuccess) {
+                responseData.setStatus(200);
+                responseData.setSuccess(true);
+                responseData.setData(true);
+                responseData.setDesc("Xóa nhà hàng thành công!");
+            } else {
+                responseData.setStatus(400);
+                responseData.setSuccess(false);
+                responseData.setData(false);
+                responseData.setDesc("Xóa nhà hàng thất bại! Có thể nhà hàng không tồn tại hoặc đang được sử dụng.");
+            }
+            
+            return new ResponseEntity<>(responseData, HttpStatus.OK);
         } catch (Exception e) {
             System.err.println("Error deleting restaurant: " + e.getMessage());
             e.printStackTrace();

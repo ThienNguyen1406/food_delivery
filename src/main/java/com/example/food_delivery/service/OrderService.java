@@ -49,10 +49,22 @@ public class OrderService implements OrderServiceImp {
             Users users = new Users();
             users.setId(orderRequest.getUserId());
 
+            // Calculate total price from food items
+            long totalPrice = 0L;
+            for (int foodId : orderRequest.getFoodIds()) {
+                Optional<Food> foodOpt = foodRepository.findById(foodId);
+                if (foodOpt.isPresent()) {
+                    Food food = foodOpt.get();
+                    totalPrice += food.getPrice();
+                }
+            }
+
             Orders orders = new Orders();
             orders.setUsers(users);
             orders.setRestaurant(restaurant);
             orders.setCreateDate(new Date());
+            orders.setStatus("created"); // Set default status
+            orders.setTotalPrice(totalPrice); // Set total price
             orderRepository.save(orders);
 
             List<OrderItem> orderItems = new ArrayList<>();
@@ -84,6 +96,66 @@ public class OrderService implements OrderServiceImp {
             System.err.println("Error getting all orders: " + e.getMessage());
             e.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<OrderDTO> getAllOrdersAsDTO() {
+        try {
+            System.out.println("=== getAllOrdersAsDTO() called ===");
+            
+            // Get all orders as entities
+            List<Orders> orders = orderRepository.findAll();
+            System.out.println("Found " + orders.size() + " total orders");
+            
+            // Convert to DTOs
+            List<OrderDTO> orderDTOs = new ArrayList<>();
+            for (Orders order : orders) {
+                try {
+                    OrderDTO orderDTO = new OrderDTO();
+                    orderDTO.setId(order.getId());
+                    orderDTO.setCreateDate(order.getCreateDate());
+                    orderDTO.setStatus(order.getStatus());
+                    orderDTO.setTotalPrice(order.getTotalPrice());
+                    
+                    // User info
+                    if (order.getUsers() != null) {
+                        orderDTO.setUserId(order.getUsers().getId());
+                        orderDTO.setUserName(order.getUsers().getUserName() != null ? order.getUsers().getUserName() : "");
+                    } else {
+                        orderDTO.setUserId(0);
+                        orderDTO.setUserName("");
+                    }
+                    
+                    // Restaurant info
+                    if (order.getRestaurant() != null) {
+                        orderDTO.setRestaurantId(order.getRestaurant().getId());
+                        orderDTO.setRestaurantTitle(order.getRestaurant().getTitle() != null ? order.getRestaurant().getTitle() : "");
+                    } else {
+                        orderDTO.setRestaurantId(0);
+                        orderDTO.setRestaurantTitle("");
+                    }
+                    
+                    // Order items - fetch from OrderItemRepository
+                    // Temporarily skip order items to avoid potential issues
+                    // Can be loaded separately if needed
+                    List<OrderItemDTO> itemDTOs = new ArrayList<>();
+                    orderDTO.setItems(itemDTOs);
+                    
+                    orderDTOs.add(orderDTO);
+                } catch (Exception e) {
+                    System.err.println("Error converting order " + order.getId() + " to DTO: " + e.getMessage());
+                    e.printStackTrace();
+                    // Continue with next order instead of failing completely
+                }
+            }
+            
+            System.out.println("Converted to " + orderDTOs.size() + " OrderDTOs");
+            return orderDTOs;
+        } catch (Exception e) {
+            System.err.println("Error getting all orders as DTO: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // Re-throw to let controller handle it properly
         }
     }
 
@@ -196,19 +268,43 @@ public class OrderService implements OrderServiceImp {
     @Override
     public boolean updateOrder(int id, String status) {
         try {
-            Optional<Orders> orderOptional = orderRepository.findById(id);
-            if (orderOptional.isPresent()) {
-                Orders order = orderOptional.get();
-                if (order != null) {
-                    // Note: Orders entity chưa có status field, cần thêm vào entity nếu muốn lưu status
-                    // Hiện tại chỉ update createDate
-                    orderRepository.save(order);
-                    return true;
-                }
+            System.out.println("=== OrderService.updateOrder() called ===");
+            System.out.println("Order ID: " + id);
+            System.out.println("Status: " + status);
+            
+            if (status == null || status.trim().isEmpty()) {
+                System.err.println("Status is null or empty");
+                return false;
             }
-            return false;
+            
+            Optional<Orders> orderOptional = orderRepository.findById(id);
+            if (orderOptional.isEmpty()) {
+                System.err.println("Order not found with ID: " + id);
+                return false;
+            }
+            
+            Orders order = orderOptional.get();
+            if (order == null) {
+                System.err.println("Order object is null");
+                return false;
+            }
+            
+            // Validate status value
+            String validStatus = status.trim().toLowerCase();
+            if (!validStatus.equals("created") && !validStatus.equals("processing") && 
+                !validStatus.equals("delivered") && !validStatus.equals("cancelled")) {
+                System.err.println("Invalid status value: " + status + " (valid values: created, processing, delivered, cancelled)");
+                return false;
+            }
+            
+            // Update status
+            order.setStatus(validStatus);
+            orderRepository.save(order);
+            
+            System.out.println("✅ Order " + id + " status updated to: " + validStatus);
+            return true;
         } catch (Exception e) {
-            System.err.println("Error updating order: " + e.getMessage());
+            System.err.println("❌ Error updating order: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

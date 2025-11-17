@@ -1,6 +1,7 @@
 package com.example.food_delivery.controller.admin;
 
 import com.example.food_delivery.domain.entity.Orders;
+import com.example.food_delivery.dto.response.OrderDTO;
 import com.example.food_delivery.dto.response.ResponseData;
 import com.example.food_delivery.service.imp.OrderServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,19 @@ public class AdminOrderController {
     public ResponseEntity<?> getAllOrders() {
         ResponseData responseData = new ResponseData();
         try {
-            List<Orders> orders = orderServiceImp.getAllOrders();
+            System.out.println("=== AdminOrderController.getAllOrders() called ===");
+            // Use DTO to avoid circular reference issues
+            List<OrderDTO> orders = orderServiceImp.getAllOrdersAsDTO();
+            System.out.println("Successfully retrieved " + orders.size() + " orders as DTOs");
             responseData.setStatus(200);
             responseData.setSuccess(true);
             responseData.setData(orders);
             responseData.setDesc("Lấy danh sách đơn hàng thành công!");
             return new ResponseEntity<>(responseData, HttpStatus.OK);
         } catch (Exception e) {
-            System.err.println("Error getting all orders: " + e.getMessage());
+            System.err.println("=== ERROR in AdminOrderController.getAllOrders() ===");
+            System.err.println("Error message: " + e.getMessage());
+            System.err.println("Error class: " + e.getClass().getName());
             e.printStackTrace();
             responseData.setStatus(500);
             responseData.setSuccess(false);
@@ -109,8 +115,19 @@ public class AdminOrderController {
                 return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
             }
             
-            // Note: Orders entity chưa có status field
-            // Cần thêm status field vào Orders entity nếu muốn lưu status
+            // Validate status
+            if (status == null || status.trim().isEmpty()) {
+                responseData.setStatus(400);
+                responseData.setSuccess(false);
+                responseData.setData(false);
+                responseData.setDesc("Status không được để trống!");
+                return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+            }
+            
+            System.out.println("=== Updating order ===");
+            System.out.println("Order ID: " + id);
+            System.out.println("Status: " + status);
+            
             boolean result = orderServiceImp.updateOrder(id, status);
             
             if (result) {
@@ -118,11 +135,13 @@ public class AdminOrderController {
                 responseData.setSuccess(true);
                 responseData.setData(true);
                 responseData.setDesc("Cập nhật đơn hàng thành công!");
+                System.out.println("✅ Order " + id + " updated successfully to status: " + status);
             } else {
-                responseData.setStatus(404);
+                responseData.setStatus(400);
                 responseData.setSuccess(false);
                 responseData.setData(false);
-                responseData.setDesc("Không tìm thấy đơn hàng với ID: " + id);
+                responseData.setDesc("Cập nhật đơn hàng thất bại! Có thể đơn hàng không tồn tại hoặc status không hợp lệ.");
+                System.err.println("❌ Failed to update order " + id + " to status: " + status);
             }
             
             return new ResponseEntity<>(responseData, HttpStatus.OK);

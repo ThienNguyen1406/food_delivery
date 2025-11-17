@@ -1,13 +1,19 @@
 package com.example.food_delivery.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderItemDTO {
     private int orderId;
     private int foodId;
     private String foodTitle;
     private String foodImage;
     private double foodPrice;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone = "UTC")
     private Date createDate;
     
     public OrderItemDTO() {

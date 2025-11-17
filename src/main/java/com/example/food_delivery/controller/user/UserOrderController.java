@@ -151,29 +151,42 @@ public class UserOrderController {
     public ResponseEntity<?> getOrdersByUserId(@PathVariable int userId) {
         ResponseData responseData = new ResponseData();
         try {
+            System.out.println("=== GET /order/user/" + userId + " called ===");
+            
             // Validate userId
             if (userId <= 0) {
+                System.err.println("Invalid userId: " + userId);
                 responseData.setStatus(400);
                 responseData.setSuccess(false);
                 responseData.setData(null);
-                responseData.setDesc("User ID không hợp lệ!");
+                responseData.setDesc("User ID không hợp lệ! User ID phải lớn hơn 0.");
                 return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
             }
             
+            System.out.println("Calling orderServiceImp.getOrdersByUserIdAsDTO(" + userId + ")...");
             List<OrderDTO> orders = orderServiceImp.getOrdersByUserIdAsDTO(userId);
+            System.out.println("Found " + (orders != null ? orders.size() : 0) + " orders for user " + userId);
             
             responseData.setStatus(200);
             responseData.setSuccess(true);
-            responseData.setData(orders);
+            responseData.setData(orders != null ? orders : new ArrayList<>());
             responseData.setDesc("Lấy danh sách đơn hàng thành công!");
             return new ResponseEntity<>(responseData, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            System.err.println("IllegalArgumentException: " + e.getMessage());
+            e.printStackTrace();
+            responseData.setStatus(400);
+            responseData.setSuccess(false);
+            responseData.setData(null);
+            responseData.setDesc("Thông tin không hợp lệ: " + e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             System.err.println("Error getting orders by user id: " + e.getMessage());
             e.printStackTrace();
             responseData.setStatus(500);
             responseData.setSuccess(false);
             responseData.setData(null);
-            responseData.setDesc("Lỗi khi lấy đơn hàng: " + e.getMessage());
+            responseData.setDesc("Lỗi server khi lấy đơn hàng: " + e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

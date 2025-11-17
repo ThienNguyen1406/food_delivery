@@ -61,17 +61,30 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     }
 
     private boolean requiresAdminRole(String path) {
+        // All /admin/* endpoints are handled by @PreAuthorize in controllers
+        // Don't double-check here to avoid conflicts
+        if (path.startsWith("/admin/")) {
+            return false; // Let @PreAuthorize handle it
+        }
+        
         // Exclude GET endpoints that are public
-        if (path.startsWith("/restaurant") && !path.startsWith("/restaurant/file") && 
-            !path.startsWith("/restaurant/detail") && path.length() > 11) {
+        // Allow /restaurant/file/** for public access
+        if (path.startsWith("/restaurant/file/")) {
+            return false; // Public access for restaurant images
+        }
+        if (path.startsWith("/restaurant") && !path.startsWith("/restaurant/detail") && path.length() > 11) {
             // Only require admin for POST, PUT, DELETE on /restaurant
             return true;
         }
-        if (path.startsWith("/category") && path.length() > 10) {
-            // Only require admin for POST, PUT, DELETE on /category
+        if (path.startsWith("/category") && !path.startsWith("/admin/category") && path.length() > 10) {
+            // Only require admin for POST, PUT, DELETE on /category (not /admin/category)
             return true;
         }
-        if (path.startsWith("/menu") && !path.startsWith("/menu/file") && path.length() > 5) {
+        // Allow /menu/file/** for public access
+        if (path.startsWith("/menu/file/")) {
+            return false; // Public access for menu images
+        }
+        if (path.startsWith("/menu") && path.length() > 5) {
             // Only require admin for POST, PUT, DELETE on /menu
             return true;
         }

@@ -18,4 +18,8 @@ public interface RestaurantServiceImp {
 
     List<RestaurantDTO> getHomePageRestaurant();
     RestaurantDTO getDetailRestaurant(int id);
+    
+    boolean updateRestaurant(int id, MultipartFile file, String title, String subtitle, String description, Boolean is_freeship, String address, String open_date);
+    
+    boolean deleteRestaurant(int id);
 }

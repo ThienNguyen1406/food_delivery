@@ -1,5 +1,6 @@
 package com.example.food_delivery.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,9 +28,11 @@ public class Category {
     private Date createDate;
 
     @OneToMany(mappedBy = "category")
+    @JsonIgnore // Prevent circular reference when serializing to JSON
     private Set<Food> lisFood;
 
     @OneToMany(mappedBy = "category")
+    @JsonIgnore // Prevent circular reference when serializing to JSON
     private Set<MenuRestaurant> lisMenuRestaurant;
 
     public Set<MenuRestaurant> getLisMenuRestaurant() {

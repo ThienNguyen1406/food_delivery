@@ -12,6 +12,11 @@ public interface OrderServiceImp {
     
     List<Orders> getAllOrders();
     
+    /**
+     * Get all orders as DTOs (to avoid circular reference)
+     */
+    List<OrderDTO> getAllOrdersAsDTO();
+    
     Optional<Orders> getOrderById(int id);
     
     List<Orders> getOrdersByUserId(int userId);

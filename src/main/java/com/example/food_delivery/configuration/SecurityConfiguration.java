@@ -30,6 +30,8 @@ public class SecurityConfiguration {
         "/category", // GET categories for public (exact match)
         "/category/**", // Category endpoints for public
         "/menu/file/**", // GET menu images for public
+        "/search/**", // Search endpoints for public
+        "/promo/**", // Promo endpoints for public
         "/theme/**", // Frontend theme-sidebar files
         "/admin/**", // Admin panel files (includes /admin/**.html)
         "/", // Root - serve index.html
