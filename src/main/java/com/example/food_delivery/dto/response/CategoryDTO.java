@@ -1,24 +1,21 @@
 package com.example.food_delivery.dto.response;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryDTO {
-    private String name;
+    Integer id;
+    String name;
     List<MenuDTO> menus;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<MenuDTO> getMenus() {
-        return menus;
-    }
-
-    public void setMenus(List<MenuDTO> menus) {
-        this.menus = menus;
-    }
 }

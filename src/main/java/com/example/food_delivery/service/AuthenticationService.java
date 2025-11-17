@@ -38,9 +38,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationService implements AuthenticationServiceImp {
-    UserReponsitory userRepository;
+    private final UserReponsitory userRepository;
 
-    InvalidatedTokenRepository invalidatedTokenRepository;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
     @Value("${jwt.privatekey:PA7ummSP4r0RY9AlAn1LfgNoNBjZsejBHoiQAF79HGE=}")
@@ -56,18 +56,32 @@ public class AuthenticationService implements AuthenticationServiceImp {
 
     @Override
     public AuthenticationResponse checkLogin(LoginRequest loginRequest) {
+        log.info("🔐 Attempting login for user: {}", loginRequest.getUsername());
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         var user = userRepository.findByUserName(loginRequest.getUsername());
         if (user == null) {
+            log.warn("❌ User not found: {}", loginRequest.getUsername());
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
 
+        log.info("👤 User found: {} - Has role: {}", user.getUserName(), 
+            user.getRoles() != null ? user.getRoles().getRoleName() : "null");
+        log.info("🔐 Comparing password: input length={}, stored length={}", 
+            loginRequest.getPassword() != null ? loginRequest.getPassword().length() : 0,
+            user.getPassword() != null ? user.getPassword().length() : 0);
+        
         boolean issSuccess = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
+        
+        log.info("🔐 Password match result: {}", issSuccess ? "✅ MATCH" : "❌ NO MATCH");
 
         if (!issSuccess) {
+            log.warn("❌ Password mismatch for user: {}", loginRequest.getUsername());
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
+        
+        log.info("✅ Login successful for user: {}", loginRequest.getUsername());
         var token = generateToken(user);
+        log.info("🎫 Token generated for user: {} - Token length: {}", loginRequest.getUsername(), token.length());
         return AuthenticationResponse.builder().authenticated(true).token(token).build();
     }
 
@@ -142,7 +156,7 @@ public class AuthenticationService implements AuthenticationServiceImp {
 
     private String generateToken(Users users) {
 
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(users.getUserName())
@@ -170,11 +184,19 @@ public class AuthenticationService implements AuthenticationServiceImp {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (user.getRoles() != null) {
             var role = user.getRoles();
-            stringJoiner.add("ROLE_" + role.getRoleName());
+            String roleName = role.getRoleName();
+            String roleScope = "ROLE_" + roleName;
+            stringJoiner.add(roleScope);
+            log.info("✅ Token scope for user {}: role={}, scope={}", user.getUserName(), roleName, roleScope);
+            
             if (!CollectionUtils.isEmpty(role.getPermissions())) {
                 role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
             }
+        } else {
+            log.warn("⚠️ User {} has no role assigned!", user.getUserName());
         }
-        return stringJoiner.toString();
+        String scope = stringJoiner.toString();
+        log.info("📝 Final scope for user {}: {}", user.getUserName(), scope);
+        return scope;
     }
 }

@@ -2,7 +2,6 @@ package com.example.food_delivery.service;
 
 import com.example.food_delivery.dto.request.SignupRequest;
 import com.example.food_delivery.dto.response.UserDTO;
-import com.example.food_delivery.domain.entity.Roles;
 import com.example.food_delivery.domain.entity.Users;
 import com.example.food_delivery.reponsitory.UserReponsitory;
 import com.example.food_delivery.service.imp.LoginServiceImp;
@@ -46,16 +45,27 @@ public class LoginService implements LoginServiceImp {
 
     @Override
     public Boolean addUser(SignupRequest signUpRequest) {
-        Users users = new Users();
-        users.setFullName(signUpRequest.getFullname());
-        users.setPassword(signUpRequest.getPassword());
-        users.setUserName(signUpRequest.getUserName());
+        try {
+            // Check if user already exists
+            Users existingUser = userReponsitory.findByUserName(signUpRequest.getUserName());
+            if (existingUser != null) {
+                System.err.println("User already exists: " + signUpRequest.getUserName());
+                return false;
+            }
+            
+            Users users = new Users();
+            users.setFullName(signUpRequest.getFullname());
+            // Encode password before saving
+            users.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+            users.setUserName(signUpRequest.getUserName());
 
-        //save thành công id sẽ có giá trị
-        try{
+            // Save user - will throw exception if fails
             userReponsitory.save(users);
+            System.out.println("User created successfully: " + signUpRequest.getUserName());
             return true;
-        }catch(Exception e){
+        } catch (Exception e) {
+            System.err.println("Error creating user: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

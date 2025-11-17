@@ -1,6 +1,7 @@
 package com.example.food_delivery.domain.entity;
 
 import com.example.food_delivery.domain.entity.keys.KeyMenuRestaurant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class MenuRestaurant {
 
     @ManyToOne
     @JoinColumn(name = "res_id", insertable = false, updatable = false)
+    @JsonIgnore // Prevent circular reference when serializing to JSON (MenuRestaurant -> Restaurant -> MenuRestaurant)
     private Restaurant restaurant;
 
     @Column(name = "created_date")

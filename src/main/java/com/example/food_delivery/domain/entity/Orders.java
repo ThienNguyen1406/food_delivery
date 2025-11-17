@@ -1,5 +1,6 @@
 package com.example.food_delivery.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,14 @@ public class Orders {
     @Column(name = "created_date")
     private Date createDate;
 
+    @Column(name = "status")
+    private String status; // Order status: "created", "processing", "delivered", "cancelled"
+
+    @Column(name = "total_price")
+    private Long totalPrice; // Total price of the order
+
     @OneToMany(mappedBy = "orders")
+    @JsonIgnore
     private Set<OrderItem> listOrderItems;
 
     public Set<OrderItem> getListOrderItems() {
@@ -72,5 +80,21 @@ public class Orders {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Long getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Long totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }
